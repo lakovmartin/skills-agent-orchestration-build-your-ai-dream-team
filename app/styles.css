@@ -1,0 +1,389 @@
+/* =========================================================================
+   Project Pulse — Dashboard Visual System
+   Owner: Designer
+   Class-name contract (see report to Orchestrator/Coder for full details):
+     .dashboard              -> page container
+     .project-card           -> one card per project
+     .status-badge + .status-<slug>   -> status pill (slug = lowercase,
+                                          spaces -> hyphens, e.g.
+                                          "On Track" -> "on-track")
+     .priority-tag + .priority-<slug> -> priority indicator (slug = lowercase
+                                          of the priority value, e.g. "high")
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   0. Design tokens (spacing scale, palette, typography, elevation)
+   ------------------------------------------------------------------------- */
+:root {
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  /* Color palette — neutrals */
+  --color-bg: #f1f4f9;
+  --color-surface: #ffffff;
+  --color-border: #e2e6ed;
+  --color-text-primary: #16202b;
+  --color-text-secondary: #4b5768;
+  --color-text-muted: #6b7686;
+
+  /* Brand accent */
+  --color-accent: #3457d5;
+  --color-accent-dark: #24399a;
+
+  /* Status palette (WCAG-AA-ish contrast on light backgrounds) */
+  --status-on-track-bg: #e2f6ea;
+  --status-on-track-fg: #1a7a42;
+  --status-at-risk-bg: #fff2d9;
+  --status-at-risk-fg: #925a00;
+  --status-blocked-bg: #fde3e3;
+  --status-blocked-fg: #b0221f;
+  --status-complete-bg: #e6e9ff;
+  --status-complete-fg: #3f3fae;
+
+  /* Priority palette */
+  --priority-high-fg: #b0221f;
+  --priority-high-bg: #fdeceb;
+  --priority-medium-fg: #925a00;
+  --priority-medium-bg: #fff6e6;
+  --priority-low-fg: #256a3b;
+  --priority-low-bg: #eaf7ee;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 10px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 14px 32px rgba(16, 24, 40, 0.14);
+
+  /* Radii */
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Typography */
+  --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+/* -------------------------------------------------------------------------
+   1. Reset & base
+   ------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: linear-gradient(180deg, #eef1f8 0%, #f6f8fb 100%);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+/* -------------------------------------------------------------------------
+   2. Page container — `.dashboard`
+   ------------------------------------------------------------------------- */
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-7);
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: var(--space-5) var(--space-4) var(--space-6);
+    border-radius: 0;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   3. Page header & typography hierarchy
+   ------------------------------------------------------------------------- */
+.dashboard-header {
+  margin-bottom: var(--space-6);
+}
+
+.dashboard h1,
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-primary);
+}
+
+.dashboard-subtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------------
+   4. Responsive card grid
+   ------------------------------------------------------------------------- */
+.project-grid,
+#project-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+}
+
+/* Tablet ~768px: allow 2-up naturally via auto-fit, but keep a floor width */
+@media (max-width: 768px) {
+  .project-grid,
+  #project-list {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+/* Mobile ~375px: force single column for readability */
+@media (max-width: 480px) {
+  .project-grid,
+  #project-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Desktop ~1200px+: cap column growth so cards don't over-stretch */
+@media (min-width: 1200px) {
+  .project-grid,
+  #project-list {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+/* -------------------------------------------------------------------------
+   5. Project card — `.project-card`
+   ------------------------------------------------------------------------- */
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 5px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-5);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.project-card:hover,
+.project-card:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.project-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.project-card h2,
+.project-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.project-card-owner {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.project-card-owner::before {
+  content: "👤 ";
+}
+
+.project-card-activity {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--color-border);
+}
+
+.project-card-activity .label {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-right: var(--space-1);
+}
+
+.project-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-3);
+}
+
+/* -------------------------------------------------------------------------
+   6. Status badges — `.status-badge` + `.status-<slug>` modifiers
+   ------------------------------------------------------------------------- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.status-badge::before {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-on-track {
+  background: var(--status-on-track-bg);
+  color: var(--status-on-track-fg);
+}
+
+.status-at-risk {
+  background: var(--status-at-risk-bg);
+  color: var(--status-at-risk-fg);
+}
+
+.status-blocked {
+  background: var(--status-blocked-bg);
+  color: var(--status-blocked-fg);
+}
+
+.status-complete {
+  background: var(--status-complete-bg);
+  color: var(--status-complete-fg);
+}
+
+/* -------------------------------------------------------------------------
+   7. Priority treatment — `.priority-tag` + `.priority-<slug>` modifiers
+   Not color-only: each carries a text label and a distinct glyph/shape so
+   the signal survives grayscale/color-blind viewing.
+   ------------------------------------------------------------------------- */
+.priority-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.priority-tag::before {
+  font-size: 0.85em;
+  line-height: 1;
+}
+
+.priority-high {
+  color: var(--priority-high-fg);
+  background: var(--priority-high-bg);
+}
+
+.priority-high::before {
+  content: "▲ High";
+}
+
+.priority-medium {
+  color: var(--priority-medium-fg);
+  background: var(--priority-medium-bg);
+}
+
+.priority-medium::before {
+  content: "● Medium";
+}
+
+.priority-low {
+  color: var(--priority-low-fg);
+  background: var(--priority-low-bg);
+}
+
+.priority-low::before {
+  content: "▼ Low";
+}
+
+/* Card left-border accent reinforces priority without relying on the tag
+   alone — pair this class on .project-card with a priority-<slug> modifier
+   if Coder wants an at-a-glance scan color on the card edge. */
+.project-card.priority-high {
+  border-left-color: var(--priority-high-fg);
+  background: linear-gradient(90deg, var(--priority-high-bg) 0%, var(--color-surface) 6%);
+}
+
+.project-card.priority-medium {
+  border-left-color: var(--priority-medium-fg);
+}
+
+.project-card.priority-low {
+  border-left-color: var(--priority-low-fg);
+}
+
+/* -------------------------------------------------------------------------
+   8. Empty / loading states (polish, avoids bare "no content" flash)
+   ------------------------------------------------------------------------- */
+.dashboard-empty,
+.dashboard-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-7) var(--space-4);
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+/* -------------------------------------------------------------------------
+   9. Accessibility helpers
+   ------------------------------------------------------------------------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}

@@ -1,0 +1,70 @@
+{
+  "projects": [
+    {
+      "id": "atlas-onboarding",
+      "name": "Atlas Onboarding Revamp",
+      "owner": "Priya Shah",
+      "status": "On Track",
+      "priority": "High",
+      "recentActivity": "Merged new onboarding flow into staging on Oct 2.",
+      "progress": 72,
+      "dueDate": "2025-11-15",
+      "summary": "Redesigning first-run experience for new contributors."
+    },
+    {
+      "id": "billing-migration",
+      "name": "Billing Platform Migration",
+      "owner": "Marcus Lee",
+      "status": "At Risk",
+      "priority": "High",
+      "recentActivity": "Data reconciliation job failed twice this week; investigating root cause.",
+      "progress": 41,
+      "dueDate": "2025-10-20",
+      "summary": "Moving legacy invoicing service onto the new billing ledger."
+    },
+    {
+      "id": "mobile-notifications",
+      "name": "Mobile Push Notifications",
+      "owner": "Sofia Nguyen",
+      "status": "Blocked",
+      "priority": "Medium",
+      "recentActivity": "Waiting on third-party APNs certificate renewal from IT security.",
+      "progress": 18,
+      "dueDate": "2025-12-05",
+      "summary": "Adding opt-in push notifications for order status updates."
+    },
+    {
+      "id": "docs-portal-refresh",
+      "name": "Docs Portal Refresh",
+      "owner": "Amara Okafor",
+      "status": "Complete",
+      "priority": "Low",
+      "recentActivity": "Shipped redesigned navigation and search on Sep 28; monitoring feedback.",
+      "progress": 100,
+      "dueDate": "2025-09-28",
+      "summary": "Modernizing the developer documentation site's information architecture."
+    },
+    {
+      "id": "checkout-perf",
+      "name": "Checkout Performance Tuning",
+      "owner": "Diego Ramirez",
+      "status": "On Track",
+      "priority": "High",
+      "recentActivity": "Reduced median checkout load time from 2.4s to 1.6s after CDN cache tuning.",
+      "progress": 63,
+      "dueDate": "2025-11-01",
+      "summary": "Optimizing checkout page load and API latency for peak traffic season."
+    },
+    {
+      "id": "internal-search-upgrade",
+      "name": "Internal Search Upgrade",
+      "owner": "Yuki Tanaka",
+      "status": "At Risk",
+      "priority": "Medium",
+      "recentActivity": "Search relevance regression reported by support team; rollback under review.",
+      "progress": 55,
+      "dueDate": "2025-11-30",
+      "summary": "Replacing internal search index with a faster, more relevant ranking engine."
+    }
+  ]
+}

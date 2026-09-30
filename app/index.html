@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="dashboard">
+    <header class="dashboard-header">
+      <h1 class="dashboard-title">Project Pulse</h1>
+      <p class="dashboard-subtitle">A snapshot of active project status, priority, and recent activity.</p>
+    </header>
+    <main>
+      <div class="project-grid" id="project-list" aria-live="polite">
+        <p class="dashboard-loading">Loading projects…</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function slugify(value) {
+      return String(value).toLowerCase().trim().replace(/\s+/g, "-");
+    }
+
+    function renderEmpty(container) {
+      container.innerHTML = "";
+      const empty = document.createElement("p");
+      empty.className = "dashboard-empty";
+      empty.textContent = "No projects to show right now.";
+      container.appendChild(empty);
+    }
+
+    function renderError(container) {
+      container.innerHTML = "";
+      const error = document.createElement("p");
+      error.className = "dashboard-empty";
+      error.textContent =
+        "Couldn't load project-data.json. Please run Project Pulse through the local server (see .vscode/launch.json) instead of opening index.html directly from the file system.";
+      container.appendChild(error);
+    }
+
+    function createProjectCard(project) {
+      const statusSlug = slugify(project.status || "unknown");
+      const prioritySlug = slugify(project.priority || "unknown");
+
+      const card = document.createElement("article");
+      card.className = "project-card priority-" + prioritySlug;
+
+      const header = document.createElement("div");
+      header.className = "project-card-header";
+
+      const title = document.createElement("h2");
+      title.className = "project-card-title";
+      title.textContent = project.name || "Untitled project";
+      header.appendChild(title);
+
+      const statusBadge = document.createElement("span");
+      statusBadge.className = "status-badge status-" + statusSlug;
+      statusBadge.textContent = project.status || "Unknown";
+      statusBadge.setAttribute("aria-label", "Status: " + (project.status || "Unknown"));
+      header.appendChild(statusBadge);
+
+      card.appendChild(header);
+
+      const owner = document.createElement("p");
+      owner.className = "project-card-owner";
+      owner.textContent = project.owner || "Unassigned";
+      card.appendChild(owner);
+
+      const activity = document.createElement("p");
+      activity.className = "project-card-activity";
+      const activityLabel = document.createElement("span");
+      activityLabel.className = "label";
+      activityLabel.textContent = "Activity:";
+      activity.appendChild(activityLabel);
+      activity.appendChild(document.createTextNode(" " + (project.recentActivity || "No recent activity.")));
+      card.appendChild(activity);
+
+      const footer = document.createElement("div");
+      footer.className = "project-card-footer";
+
+      const priorityTag = document.createElement("span");
+      priorityTag.className = "priority-tag priority-" + prioritySlug;
+      priorityTag.textContent = project.priority || "Unknown";
+      priorityTag.setAttribute("aria-label", "Priority: " + (project.priority || "Unknown"));
+      footer.appendChild(priorityTag);
+
+      card.appendChild(footer);
+
+      return card;
+    }
+
+    function renderProjects(projects, container) {
+      if (!Array.isArray(projects) || projects.length === 0) {
+        renderEmpty(container);
+        return;
+      }
+      container.innerHTML = "";
+      projects.forEach(function (project) {
+        container.appendChild(createProjectCard(project));
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const container = document.getElementById("project-list");
+
+      fetch("project-data.json")
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Network response was not ok (" + response.status + ")");
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          renderProjects(data && data.projects, container);
+        })
+        .catch(function (err) {
+          console.error("Failed to load project-data.json:", err);
+          renderError(container);
+        });
+    });
+  </script>
+</body>
+</html>
